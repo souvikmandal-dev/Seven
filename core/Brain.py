@@ -36,7 +36,21 @@ class Brain:
         try:
             if "what time" in user_input.lower():
                 current_time = get_current_time()
-                return f"Seven: The current time is {current_time}."
+                response = f"The current time is {current_time}."
+
+                self.messages.append({
+                    "role": "user",
+                    "content": user_input
+                })
+                self.messages.append({
+                    "role": "assistant",
+                    "content": response
+                })
+
+                self.messages = self.messages[-MAX_MEMORY_MESSAGES:]
+                self.save_memory()
+
+                return f"Seven: {response}"
 
             self.messages.append({
                 "role": "user",
