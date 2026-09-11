@@ -2,6 +2,7 @@ import anthropic
 from dotenv import load_dotenv
 import json
 import os
+from tools import get_current_time
 
 load_dotenv()
 
@@ -33,6 +34,10 @@ class Brain:
 
     def talk(self, user_input):
         try:
+            if "what time" in user_input.lower():
+                current_time = get_current_time()
+                return f"Seven: The current time is {current_time}."
+
             self.messages.append({
                 "role": "user",
                 "content": user_input
