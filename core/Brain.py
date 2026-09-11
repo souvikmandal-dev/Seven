@@ -8,6 +8,7 @@ load_dotenv()
 client = anthropic.Anthropic()
 
 MODEL = "claude-sonnet-5"
+MAX_MEMORY_MESSAGES = 20
 
 MEMORY_FILE = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
@@ -37,16 +38,17 @@ class Brain:
                 "content": user_input
             })
 
+            self.messages = self.messages[-MAX_MEMORY_MESSAGES:]
+
             message = client.messages.create(
                 model=MODEL,
                 max_tokens=150,
                 system=(
-    "You are Seven, a professional personal AI assistant. "
-    "Your creator is Souvik Mandal. "
-    "Address Souvik as Master when appropriate. "
-    "Be concise, intelligent, calm, and helpful."
-),
-
+                    "You are Seven, a professional personal AI assistant. "
+                    "Your creator is Souvik Mandal. "
+                    "Address Souvik as Master when appropriate. "
+                    "Be concise, intelligent, calm, and helpful."
+                ),
                 messages=self.messages
             )
 
@@ -54,11 +56,17 @@ class Brain:
                 block.text for block in message.content
                 if hasattr(block, "text")
             )
+
             self.messages.append({
                 "role": "assistant",
                 "content": response
             })
+
+            self.messages = self.messages[-MAX_MEMORY_MESSAGES:]
+
             self.save_memory()
-            return response
+
+            return f"Seven: {response}"
+
         except Exception as error:
-            return f"Error: {error}"
+            return f"Seven: Error connecting to my AI brain: {error}"
